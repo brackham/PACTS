@@ -19,11 +19,12 @@ mTiO = 63.8664          # Same for titaniun oxyde (amus)
 #################################################################
 
 ####################### Planet inputs ###########################
-R0 = 1.20*Rj            # Reference radius, in cm
+R0 = 1.395*Rj           # Reference radius, in cm
 P0 = 10.                # Reference pressure, in bars
-Rs = 1.038*Rsun          # Stellar radii, in cm
-g = 713.               # Planetary gravity, in cm/s^2
-T = 1399.               # Temperature in the atmosphere, in K
+Rs = 1.004*Rsun         # Stellar radii, in cm
+g = 1420.               # Planetary gravity, in cm/s^2
+T = 2077.               # Temperature in the atmosphere, in K
+rayleigh = True         # Set this to true if you want to add Rayleigh Scattering
 sigma_cloud = 0.0       # If you have an oppacity for the clouds, add it here.
 #################################################################
 
@@ -65,6 +66,20 @@ CO2 = 2.237e-08
 CO = 0.00010077
 TiO = 1.4808e-07
 """
+def sigma_scattering(wav,nref):
+    """
+    This returns the cross-section due to Rayleigh Scattering. 
+    It assumes wavelengths are in cm and nref, the number density at a 
+    reference temperature and pressure, is in cm^-3. It assumes the King factor 
+    to be unity. It follows the formalism outlined in Malik et al. (2016), ApJ, 153, 56.
+    """
+    refractive_index = 13.58e-5*(1.+(7.52e-11/wav**2)) + 1.
+
+    fact1 = (24.*(np.pi**3))/((nref)**2 * wav**4)
+    fact2 = ((refractive_index**2 - 1.)/(refractive_index**2 + 2.))**2
+    
+    return fact1*fact2
+
 # Conver bars to cgs:
 P0 = P0*1e6          # 1 bar = 1e6 g/cm/s^2
 
@@ -97,6 +112,11 @@ for molecule in ['H2O','CH4','CO2','CO','TiO']:
 
 # Add cloud cross-section:
 sigma = sigma + sigma_cloud
+
+# Add Rayleigh Scattering, if desired:
+if rayleigh:
+    print 'Reference density:',P0/(kB*T),'1/cm^3'
+    sigma = sigma + sigma_scattering(wavelength,P0/(kB*T))
 
 # Keep computations only where sigma != 0 (i.e., were there is 
 # at least one opacity source):
