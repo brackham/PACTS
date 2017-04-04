@@ -11,3 +11,9 @@ from 5000 cm^-1 to 29999 cm^-1 (i.e., go from 330 nm to 2000 nm), and have resol
 that you have to download the cross-sections for your molecules from the webpage, and put them in the 
 `cross_section` folder as `MOLECULE_TEMPERATURE.sigma` files (e.g., `H2O_1200.sigma` for the 
 cross-section of water for a T = 1200 K atmosphere).
+
+TODO
+----
+- Add Na and K.
+- Add CIA.
+
